@@ -2,11 +2,10 @@
 #include <iostream>
 
 #include "src/UMTriple.h"
+#include "src/infos.h"
 
 int main(){
-    constexpr const char* umatrix = "UMATRIX";
-    constexpr const char* umatrixInfo = "[UMATRIX]";
-    std::cout << umatrixInfo << " " << umatrix << " starting" << '\n';
+    std::cout << Info::nameMessage() << Info::name() << " starting" << '\n';
 
     UMTriple<double> testTensor{3};
 
