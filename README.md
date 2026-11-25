@@ -11,3 +11,7 @@ writen by me. Almost no AI usage because reason of this projects existence is ed
 - Contributions are not accepted probably because as I sad this project is exist for mastering myself.
 
 - Why not Rust but C?: Nah, I want to experience the danger zone.
+
+## License
+
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.

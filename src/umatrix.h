@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 <Ad Soyad>
+
 // umatrix.h - experimental matrix library in pure C
 //
 // Public interface. Function bodies live in src/umatrix.c and are shipped
