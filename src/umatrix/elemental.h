@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 <Ad Soyad>
+// Copyright (c) 2026 suacayipkisi
 
 // umatrix.h - experimental matrix library in pure C
 //
@@ -65,10 +65,10 @@ void um_im_print(U_Im_Matrix m, const char *name);
 #define UM_PRINT(m) um_print((m), #m)
 #define UM_IM_PRINT(m) um_im_print((m), #m);
 
-// --- Step 2: element-wise ops (TODO) ----------------------------------------
-// void um_add(U_Matrix dst, U_Matrix a, U_Matrix b);
-// void um_sub(U_Matrix dst, U_Matrix a, U_Matrix b);
-// void um_scale(U_Matrix dst, U_Matrix a, double k);
+// element wise operations: adding, substracting and scaling with a value
+void um_add(U_Matrix dst, U_Matrix a, U_Matrix b);
+void um_sub(U_Matrix dst, U_Matrix a, U_Matrix b);
+void um_scale(U_Matrix dst, U_Matrix a, double k);
 
 // --- Step 3: multiplication (TODO) ------------------------------------------
 // void um_mul(U_Matrix dst, U_Matrix a, U_Matrix b);

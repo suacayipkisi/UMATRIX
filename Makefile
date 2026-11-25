@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2026 <Ad Soyad>
+# Copyright (c) 2026 suacayipkisi
 
 VERSION   := 0.0.1
 
