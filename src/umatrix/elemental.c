@@ -261,7 +261,91 @@ void um_cmpx_scale_cmpx(U_Cmpx_Matrix dst, U_Cmpx_Matrix a, double complex k){
     }
 }
 
-void um_mul(U_Matrix dst, U_Matrix a, U_Matrix b);
-void um_cmpx_mul_real(U_Matrix dst, U_Matrix a, U_Matrix b);
-void um_real_mul_cmpx(U_Matrix dst, U_Matrix a, U_Matrix b);
-void um_cmpx_mul_cmpx(U_Matrix dst, U_Matrix a, U_Matrix b);
+/* multiplication of two real number matrices. (i,j) x (k,l) => should satisfy j == k and result mush be (i,l) */
+void um_mul(U_Matrix dst, U_Matrix a, U_Matrix b){
+    size_t col = dst.cols;
+    size_t row = dst.rows;
+    UM_ASSERT((a.cols == b.rows) && (dst.rows == a.rows) && (dst.cols == b.cols));
+    for(size_t i = 0; i < row; ++i){
+        for(size_t j = 0; j < col; ++j){
+            double temp_sum = 0;
+            for(size_t k = 0; k < a.cols; ++k){
+                temp_sum += a.data[i * a.stride + k] * b.data[k * b.stride + j]; 
+            }
+            dst.data[i * dst.stride + j] = temp_sum;
+        }
+    }
+}
+
+void um_cmpx_mul_real(U_Cmpx_Matrix dst, U_Cmpx_Matrix a, U_Matrix b){
+    size_t col = dst.cols;
+    size_t row = dst.rows;
+    UM_ASSERT((a.cols == b.rows) && (dst.rows == a.rows) && (dst.cols == b.cols));
+    for(size_t i = 0; i < row; ++i){
+        for(size_t j = 0; j < col; ++j){
+            double complex temp_sum = 0;
+            for(size_t k = 0; k < a.cols; ++k){
+                temp_sum += a.data[i * a.stride + k] * b.data[k * b.stride + j]; 
+            }
+            dst.data[i * dst.stride + j] = temp_sum;
+        }
+    }
+}
+
+void um_real_mul_cmpx(U_Cmpx_Matrix dst, U_Matrix a, U_Cmpx_Matrix b){
+    size_t col = dst.cols;
+    size_t row = dst.rows;
+    UM_ASSERT((a.cols == b.rows) && (dst.rows == a.rows) && (dst.cols == b.cols));
+    for(size_t i = 0; i < row; ++i){
+        for(size_t j = 0; j < col; ++j){
+            double complex temp_sum = 0;
+            for(size_t k = 0; k < a.cols; ++k){
+                temp_sum += a.data[i * a.stride + k] * b.data[k * b.stride + j]; 
+            }
+            dst.data[i * dst.stride + j] = temp_sum;
+        }
+    }
+}
+
+void um_cmpx_mul_cmpx(U_Cmpx_Matrix dst, U_Cmpx_Matrix a, U_Cmpx_Matrix b){
+    size_t col = dst.cols;
+    size_t row = dst.rows;
+    UM_ASSERT((a.cols == b.rows) && (dst.rows == a.rows) && (dst.cols == b.cols));
+    for(size_t i = 0; i < row; ++i){
+        for(size_t j = 0; j < col; ++j){
+            double complex temp_sum = 0;
+            for(size_t k = 0; k < a.cols; ++k){
+                temp_sum += a.data[i * a.stride + k] * b.data[k * b.stride + j]; 
+            }
+            dst.data[i * dst.stride + j] = temp_sum;
+        }
+    }
+}
+
+void um_transpose(U_Matrix dst, U_Matrix a){
+    size_t col = dst.cols;
+    size_t row = dst.rows;
+    UM_ASSERT((col == a.rows) && (row == a.cols));
+    for(size_t i = 0; i < row; ++i){
+        for(size_t j = 0; j < col; ++j){
+            dst.data[i * col + j] = a.data[j * row +i];
+        }
+    }
+}
+
+void um_cmpx_transpose(U_Cmpx_Matrix dst, U_Cmpx_Matrix a){
+    size_t col = dst.cols;
+    size_t row = dst.rows;
+    UM_ASSERT((col == a.rows) && (row == a.cols));
+    for(size_t i = 0; i < row; ++i){
+        for(size_t j = 0; j < col; ++j){
+            dst.data[i * col + j] = a.data[j * row +i];
+        }
+    }
+}
+
+void um_identity(U_Matrix m){
+    for(size_t i = 0; i < m.stride; ++i){
+        m.data[i * m.stride + i] = 1.0;
+    }
+}

@@ -85,17 +85,13 @@ void um_cmpx_scale_cmpx(U_Cmpx_Matrix dst, U_Cmpx_Matrix a, double complex k);
 
 /* basic matrix multiplication */
 void um_mul(U_Matrix dst, U_Matrix a, U_Matrix b);
-void um_cmpx_mul_real(U_Matrix dst, U_Matrix a, U_Matrix b);
-void um_real_mul_cmpx(U_Matrix dst, U_Matrix a, U_Matrix b);
-void um_cmpx_mul_cmpx(U_Matrix dst, U_Matrix a, U_Matrix b);
+void um_cmpx_mul_real(U_Cmpx_Matrix dst, U_Cmpx_Matrix a, U_Matrix b);
+void um_real_mul_cmpx(U_Cmpx_Matrix dst, U_Matrix a, U_Cmpx_Matrix b);
+void um_cmpx_mul_cmpx(U_Cmpx_Matrix dst, U_Cmpx_Matrix a, U_Cmpx_Matrix b);
 
 // transpose / identity
-// void um_transpose(U_Matrix dst, U_Matrix a);
-// void um_identity(U_Matrix m);
+void um_transpose(U_Matrix dst, U_Matrix a);
+void um_cmpx_transpose(U_Cmpx_Matrix dst, U_Cmpx_Matrix a);
+void um_identity(U_Matrix m);
 
-// Gaussian elimination
-// double um_det(U_Matrix a);
-// int    um_inverse(U_Matrix dst, U_Matrix a);   // returns 0 if singular
-// int    um_solve(U_Matrix x, U_Matrix a, U_Matrix b); // solves a * x = b
-
-#endif // UU_MatrixRIX_H_
+#endif // U_MRIX_H_
