@@ -15,28 +15,31 @@
 #ifndef UM_MALLOC
 #define UM_MALLOC malloc
 #endif
+#ifndef UM_CALLOC
+#define UM_CALLOC calloc
+#endif
 #ifndef UM_FREE
 #define UM_FREE free
 #endif
 
 /* allocation of a real number matrix */
-U_Matrix um_alloc(size_t rows, size_t cols){
+U_Matrix um_calloc(size_t rows, size_t cols){
     U_Matrix m;
     m.rows = rows;
     m.cols = cols;
     m.stride = cols;
-    m.data = UM_MALLOC(sizeof(*m.data) * rows * cols);
+    m.data = UM_CALLOC(rows * cols, sizeof(*m.data));
     UM_ASSERT(m.data != NULL);
     return m;
 }
 
 /* allocation of a complex number matrix */
-U_Cmpx_Matrix um_cmpx_alloc(size_t rows, size_t cols){
+U_Cmpx_Matrix um_cmpx_calloc(size_t rows, size_t cols){
     U_Cmpx_Matrix m;
     m.rows = rows;
     m.cols = cols;
     m.stride = cols;
-    m.data = UM_MALLOC(sizeof(*m.data) * rows * cols);
+    m.data = UM_CALLOC(rows * cols, sizeof(*m.data));
     UM_ASSERT(m.data != NULL);
     return m;
 }
@@ -133,7 +136,7 @@ void um_convert_to_cmpx(U_Cmpx_Matrix *comp_mat, U_Matrix *real_mat){
 void um_add(U_Matrix *dst, U_Matrix *a, U_Matrix *b){
     size_t col = dst->cols;
     size_t row = dst->rows;
-    UM_ASSERT((a->cols == b->cols == col) && (a->rows == b->rows == row));
+    UM_ASSERT(((a->cols == b->cols) == col) && ((a->rows == b->rows) == row));
     for(size_t i = 0; i < row; ++i){
         for(size_t j = 0; j < col; ++j){
             size_t index = i * dst->stride + j;
@@ -145,7 +148,7 @@ void um_add(U_Matrix *dst, U_Matrix *a, U_Matrix *b){
 void um_cmpx_add_real(U_Cmpx_Matrix *dst, U_Cmpx_Matrix *a, U_Matrix *b){
     size_t col = dst->cols;
     size_t row = dst->rows;
-    UM_ASSERT((a->cols == b->cols == col) && (a->rows == b->rows == row));
+    UM_ASSERT(((a->cols == b->cols) == col) && ((a->rows == b->rows) == row));
     for(size_t i = 0; i < row; ++i){
         for(size_t j = 0; j < col; ++j){
             size_t index = i * dst->stride + j;
@@ -158,7 +161,7 @@ void um_cmpx_add_real(U_Cmpx_Matrix *dst, U_Cmpx_Matrix *a, U_Matrix *b){
 void um_cmpx_add(U_Cmpx_Matrix *dst, U_Cmpx_Matrix *a, U_Cmpx_Matrix *b){
     size_t col = dst->cols;
     size_t row = dst->rows;
-    UM_ASSERT((a->cols == b->cols == col) && (a->rows == b->rows == row));
+    UM_ASSERT(((a->cols == b->cols) == col) && ((a->rows == b->rows) == row));
     for(size_t i = 0; i < row; ++i){
         for(size_t j = 0; j < col; ++j){
             size_t index = i * dst->stride + j;
@@ -171,7 +174,7 @@ void um_cmpx_add(U_Cmpx_Matrix *dst, U_Cmpx_Matrix *a, U_Cmpx_Matrix *b){
 void um_sub(U_Matrix *dst, U_Matrix *a, U_Matrix *b){
     size_t col = dst->cols;
     size_t row = dst->rows;
-    UM_ASSERT((a->cols == b->cols == col) && (a->rows == b->rows == row));
+    UM_ASSERT(((a->cols == b->cols) == col) && ((a->rows == b->rows) == row));
     for(size_t i = 0; i < row; ++i){
         for(size_t j = 0; j < col; ++j){
             size_t index = i * dst->stride + j;
@@ -183,7 +186,7 @@ void um_sub(U_Matrix *dst, U_Matrix *a, U_Matrix *b){
 void um_cmpx_sub_real(U_Cmpx_Matrix *dst, U_Cmpx_Matrix *a, U_Matrix *b){
     size_t col = dst->cols;
     size_t row = dst->rows;
-    UM_ASSERT((a->cols == b->cols == col) && (a->rows == b->rows == row));
+    UM_ASSERT(((a->cols == b->cols) == col) && ((a->rows == b->rows) == row));
     for(size_t i = 0; i < row; ++i){
         for(size_t j = 0; j < col; ++j){
             size_t index = i * dst->stride + j;
@@ -195,7 +198,7 @@ void um_cmpx_sub_real(U_Cmpx_Matrix *dst, U_Cmpx_Matrix *a, U_Matrix *b){
 void um_real_sub_cmpx(U_Cmpx_Matrix *dst, U_Matrix *a, U_Cmpx_Matrix *b){
     size_t col = dst->cols;
     size_t row = dst->rows;
-    UM_ASSERT((a->cols == b->cols == col) && (a->rows == b->rows == row));
+    UM_ASSERT(((a->cols == b->cols) == col) && ((a->rows == b->rows) == row));
     for(size_t i = 0; i < row; ++i){
         for(size_t j = 0; j < col; ++j){
             size_t index = i * dst->stride + j;
@@ -208,7 +211,7 @@ void um_real_sub_cmpx(U_Cmpx_Matrix *dst, U_Matrix *a, U_Cmpx_Matrix *b){
 void um_cmpx_sub(U_Cmpx_Matrix *dst, U_Cmpx_Matrix *a, U_Cmpx_Matrix *b){
     size_t col = dst->cols;
     size_t row = dst->rows;
-    UM_ASSERT((a->cols == b->cols == col) && (a->rows == b->rows == row));
+    UM_ASSERT(((a->cols == b->cols) == col) && ((a->rows == b->rows) == row));
     for(size_t i = 0; i < row; ++i){
         for(size_t j = 0; j < col; ++j){
             size_t index = i * dst->stride + j;

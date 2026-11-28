@@ -12,8 +12,8 @@
 //     For an owned matrix stride == cols; views may have stride > cols.
 //   - Operations write into a caller-provided `dst` (the caller owns memory).
 
-#ifndef UMATRIX_H_
-#define UMATRIX_H_
+#ifndef ELEMENTAL_H_
+#define ELEMENTAL_H_
 
 #include <stddef.h>
 #include <complex.h>
@@ -50,8 +50,8 @@ static inline double complex *um_cmpx_at(U_Cmpx_Matrix *m, size_t i, size_t j){
     return &m->data[i * m->stride + j];
 }
 
-U_Matrix  um_alloc(size_t rows, size_t cols);
-U_Cmpx_Matrix um_cmpx_alloc(size_t rows, size_t cols);
+U_Matrix um_calloc(size_t rows, size_t cols);
+U_Cmpx_Matrix um_cmpx_calloc(size_t rows, size_t cols);
 void um_free_null(U_Matrix *m);
 void um_cmpx_free_null(U_Cmpx_Matrix *m);
 void um_fill(U_Matrix *m, double value);
@@ -94,4 +94,4 @@ void um_transpose(U_Matrix *dst, U_Matrix *a);
 void um_cmpx_transpose(U_Cmpx_Matrix *dst, U_Cmpx_Matrix *a);
 void um_identity(U_Matrix *m);
 
-#endif // U_MRIX_H_
+#endif // ELEMENTAL_H_

@@ -14,9 +14,12 @@
 #ifndef UM_MALLOC
 #define UM_MALLOC malloc
 #endif
+#ifndef UM_CALLOC
+#define UM_CALLOC calloc
+#endif
 #ifndef UM_FREE
 #define UM_FREE free
-#endif
+#endif 
 
 /* allocation of a real number sparse matrix (3x3 and empty) */
 U_Matrix_Sparse um_init_sparse(size_t rows, size_t cols){
@@ -44,20 +47,7 @@ U_Cmpx_Matrix_Sparse um_cmpx_init_sparse(size_t rows, size_t cols){
     return m;
 }
 
-void um_free_null_sparse(U_Matrix_Sparse *m){
-    UM_FREE(m->data);
-    m->data = NULL;
-    m->container_size = 0;
-    m->data_num = 0;
-}
-
-void um_cmpx_free_null_sparse(U_Cmpx_Matrix_Sparse *m){
-    UM_FREE(m->data);
-    m->data = NULL;
-    m->container_size = 0;
-    m->data_num = 0;
-}
-
+// reserve a defined real matrix with a size (if given size is smaller, nothing changes)
 bool um_sparse_reserve(U_Matrix_Sparse *m, size_t new_container_size){
     if(new_container_size <= m->container_size){
         return true;
@@ -76,6 +66,7 @@ bool um_sparse_reserve(U_Matrix_Sparse *m, size_t new_container_size){
     return true;
 }
 
+// reserve a defined complex matrix with a size (if given size is smaller, nothing changes)
 bool um_cmpx_sparse_reserve(U_Cmpx_Matrix_Sparse *m, size_t new_container_size){
     if(new_container_size <= m->container_size){
         return true;
@@ -94,7 +85,7 @@ bool um_cmpx_sparse_reserve(U_Cmpx_Matrix_Sparse *m, size_t new_container_size){
     return true;
 }
 
-/* if value at this (i, j) in matrix, reallocate the data array if it is full, also check does it return true */
+/* if value at this (i, j) in real matrix, reallocate the data array if it is full, also check does it return true */
 void um_set_val_sparse(U_Matrix_Sparse *m, size_t i, size_t j, double value){
     int can_return = 1;
     UM_ASSERT(i < m->rows && j < m->cols);
@@ -116,7 +107,7 @@ void um_set_val_sparse(U_Matrix_Sparse *m, size_t i, size_t j, double value){
     UM_ASSERT(can_return == 1);
 }
 
-/* if value at this (i, j) in matrix, reallocate the data array 1,5x if it is full, also check does it return true */
+/* if value at this (i, j) in complex matrix, reallocate the data array 1,5x if it is full, also check does it return true */
 void um_cmpx_set_val_sparse(U_Cmpx_Matrix_Sparse *m, size_t i, size_t j, double complex value){
     int can_return = 1;
     UM_ASSERT(i < m->rows && j < m->cols);
@@ -136,6 +127,22 @@ void um_cmpx_set_val_sparse(U_Cmpx_Matrix_Sparse *m, size_t i, size_t j, double 
         m->data[m->data_num++] = (U_Cmpx_Sparse_Value){i, j, value}; // index start with zero, so it fills an empty place
     }
     UM_ASSERT(can_return == 1);
+}
+
+// free null a real number sparse matrix
+void um_free_null_sparse(U_Matrix_Sparse *m){
+    UM_FREE(m->data);
+    m->data = NULL;
+    m->container_size = 0;
+    m->data_num = 0;
+}
+
+// free null a complex number sparse matrix
+void um_cmpx_free_null_sparse(U_Cmpx_Matrix_Sparse *m){
+    UM_FREE(m->data);
+    m->data = NULL;
+    m->container_size = 0;
+    m->data_num = 0;
 }
 
 void um_fill_sparse(U_Matrix_Sparse *m, double value);

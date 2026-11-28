@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 suacayipkisi
 
-#ifndef UMATRIX_SPARSE_H_
-#define UMATRIX_SPARSE_H_
+#ifndef SPARSE_H_
+#define SPARSE_H_
 
 #include "elemental.h"
 #include <stddef.h>
@@ -69,19 +69,18 @@ static inline U_Cmpx_Sparse_Value *um_cmpx_at_sparse(U_Cmpx_Matrix_Sparse *m, si
 U_Matrix_Sparse um_init_sparse(size_t rows, size_t cols);
 U_Cmpx_Matrix_Sparse um_cmpx_init_sparse(size_t rows, size_t cols);
 
+// reserving the matrix 
 bool um_sparse_reserve(U_Matrix_Sparse *m, size_t new_container_size);
 bool um_cmpx_sparse_reserve(U_Cmpx_Matrix_Sparse *m, size_t new_container_size);
 
 // value assignation into a matrix (only one value), check is it true
 void um_set_val_sparse(U_Matrix_Sparse *m, size_t i, size_t j, double value);
-// value assignation into a matrix (only one value), check is it true
 void um_cmpx_set_val_sparse(U_Cmpx_Matrix_Sparse *m, size_t i, size_t j, double complex value);
 
+// release and delete the matrix
 void um_free_null_sparse(U_Matrix_Sparse *m);
 void um_cmpx_free_null_sparse(U_Cmpx_Matrix_Sparse *m);
 
-void um_fill_sparse(U_Matrix_Sparse *m, double value);
-void um_cmpx_fill_sparse(U_Cmpx_Matrix_Sparse *m, double complex value);
 void um_print_sparse(U_Matrix_Sparse *m, const char *name);
 void um_cmpx_print_sparse(U_Cmpx_Matrix_Sparse *m, const char *name);
 #define UM_PRINT_SPARSE(m) um_print_sparse((m), #m)
@@ -89,4 +88,4 @@ void um_cmpx_print_sparse(U_Cmpx_Matrix_Sparse *m, const char *name);
 
 
 
-#endif
+#endif // SPARSE_H_
