@@ -5,6 +5,7 @@
 #include "umatrix/elemental.h"
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 // Allocator hooks. Override at library build time, e.g.
 //   make CPPFLAGS='-DUM_MALLOC=my_malloc -DUM_FREE=my_free'
@@ -16,6 +17,9 @@
 #endif
 #ifndef UM_CALLOC
 #define UM_CALLOC calloc
+#endif
+#ifndef UM_MEMSET
+#define UM_MEMSET memset
 #endif
 #ifndef UM_FREE
 #define UM_FREE free
@@ -56,7 +60,7 @@ bool um_sparse_reserve(U_Matrix_Sparse *m, size_t new_container_size){
         return false;
     }
     
-    U_Sparse_Value *temporary = realloc(m->data, new_container_size * sizeof(*m->data));
+    U_Sparse_Triplet *temporary = realloc(m->data, new_container_size * sizeof(*m->data));
     if(!temporary){
         return false;
     }
@@ -75,7 +79,7 @@ bool um_cmpx_sparse_reserve(U_Cmpx_Matrix_Sparse *m, size_t new_container_size){
         return false;
     }
     
-    U_Cmpx_Sparse_Value *temporary = realloc(m->data, new_container_size * sizeof(*m->data));
+    U_Cmpx_Sparse_Triplet *temporary = realloc(m->data, new_container_size * sizeof(*m->data));
     if(!temporary){
         return false;
     }
@@ -89,7 +93,7 @@ bool um_cmpx_sparse_reserve(U_Cmpx_Matrix_Sparse *m, size_t new_container_size){
 void um_set_val_sparse(U_Matrix_Sparse *m, size_t i, size_t j, double value){
     int can_return = 1;
     UM_ASSERT(i < m->rows && j < m->cols);
-    U_Sparse_Value *val_adress = um_at_sparse(m, i, j);
+    U_Sparse_Triplet *val_adress = um_at_sparse(m, i, j);
     if(!val_adress){
         m->data[m->data_num + 1].value = value;
     } else {
@@ -102,7 +106,7 @@ void um_set_val_sparse(U_Matrix_Sparse *m, size_t i, size_t j, double value){
                 can_return = 0;
             }
         }
-        m->data[m->data_num++] = (U_Sparse_Value){i, j, value}; // index start with zero, so it fills an empty place
+        m->data[m->data_num++] = (U_Sparse_Triplet){i, j, value}; // index start with zero, so it fills an empty place
     }
     UM_ASSERT(can_return == 1);
 }
@@ -111,7 +115,7 @@ void um_set_val_sparse(U_Matrix_Sparse *m, size_t i, size_t j, double value){
 void um_cmpx_set_val_sparse(U_Cmpx_Matrix_Sparse *m, size_t i, size_t j, double complex value){
     int can_return = 1;
     UM_ASSERT(i < m->rows && j < m->cols);
-    U_Cmpx_Sparse_Value *val_adress = um_cmpx_at_sparse(m, i, j);
+    U_Cmpx_Sparse_Triplet *val_adress = um_cmpx_at_sparse(m, i, j);
     if(!val_adress){
         m->data[m->data_num + 1].value = value;
     } else {
@@ -124,7 +128,7 @@ void um_cmpx_set_val_sparse(U_Cmpx_Matrix_Sparse *m, size_t i, size_t j, double 
                 can_return = 0;
             }
         }
-        m->data[m->data_num++] = (U_Cmpx_Sparse_Value){i, j, value}; // index start with zero, so it fills an empty place
+        m->data[m->data_num++] = (U_Cmpx_Sparse_Triplet){i, j, value}; // index start with zero, so it fills an empty place
     }
     UM_ASSERT(can_return == 1);
 }
@@ -145,14 +149,94 @@ void um_cmpx_free_null_sparse(U_Cmpx_Matrix_Sparse *m){
     m->data_num = 0;
 }
 
-void um_fill_sparse(U_Matrix_Sparse *m, double value);
+// row major, getting real matrix ready to faster calculations
+/* two pass counting sort */
+void um_sparse_give_order(U_Matrix_Sparse *m){
+    size_t rows = m->rows;
+    size_t cols = m->cols;
+    size_t nnz = m->data_num; // nubebr of not zero
+    UM_ASSERT(!(nnz < 2 || rows == 0 || cols == 0));
+    
+    size_t max_dim = (rows > cols) ? rows : cols;
+    size_t *count = UM_CALLOC(max_dim + 1, sizeof(size_t));
+    U_Sparse_Triplet *tmp = UM_MALLOC(nnz * sizeof(U_Sparse_Triplet));
+    if(!count || !tmp){
+        free(count);
+        free(tmp);
+        UM_ASSERT(false);
+    }
+    
+    /* Pass 1: Stable counting sort by column (arr -> tmp) */
+    for (size_t i = 0; i < nnz; i++) {
+        count[m->data[i].col_index + 1]++;
+    }
+    for (size_t c = 0; c < cols; c++) {
+        count[c + 1] += count[c];
+    }
+    for (size_t i = 0; i < nnz; i++) {
+        tmp[count[m->data[i].col_index]++] = m->data[i];
+    }
 
-void um_cmpx_fill_sparse(U_Cmpx_Matrix_Sparse *m, double complex value);
+    /* Reset count buffer for Pass 2 */
+    UM_MEMSET(count, 0, (rows + 1) * sizeof(size_t));
 
-void um_print_sparse(U_Matrix_Sparse *m, const char *name);
+    /* Pass 2: Stable counting sort by row (tmp -> arr) */
+    for (size_t i = 0; i < nnz; i++) {
+        count[tmp[i].row_index + 1]++;
+    }
+    for (size_t r = 0; r < rows; r++) {
+        count[r + 1] += count[r];
+    }
+    for (size_t i = 0; i < nnz; i++) {
+        m->data[count[tmp[i].row_index]++] = tmp[i];
+    }
 
-void um_cmpx_print_sparse(U_Cmpx_Matrix_Sparse *m, const char *name);
+    free(tmp);
+    free(count);
+}
 
-#define UM_PRINT_SPARSE(m) um_print_sparse((m), #m)
+// row major, getting complex matrix ready to faster calculations
+/* two pass counting sort */
+void um_cmpx_sparse_give_order(U_Cmpx_Matrix_Sparse *m){
+    size_t rows = m->rows;
+    size_t cols = m->cols;
+    size_t nnz = m->data_num; // nubebr of not zero
+    UM_ASSERT(!(nnz < 2 || rows == 0 || cols == 0));
+    
+    size_t max_dim = (rows > cols) ? rows : cols;
+    size_t *count = UM_CALLOC(max_dim + 1, sizeof(size_t));
+    U_Cmpx_Sparse_Triplet *tmp = UM_MALLOC(nnz * sizeof(U_Cmpx_Sparse_Triplet));
+    if(!count || !tmp){
+        free(count);
+        free(tmp);
+        UM_ASSERT(false);
+    }
+    
+    /* Pass 1: Stable counting sort by column (arr -> tmp) */
+    for (size_t i = 0; i < nnz; i++) {
+        count[m->data[i].col_index + 1]++;
+    }
+    for (size_t c = 0; c < cols; c++) {
+        count[c + 1] += count[c];
+    }
+    for (size_t i = 0; i < nnz; i++) {
+        tmp[count[m->data[i].col_index]++] = m->data[i];
+    }
 
-#define UM_CMPX_PRINT_SPARSE(m) um_cmpx_print_sparse((m), #m);
+    /* Reset count buffer for Pass 2 */
+    UM_MEMSET(count, 0, (rows + 1) * sizeof(size_t));
+
+    /* Pass 2: Stable counting sort by row (tmp -> arr) */
+    for (size_t i = 0; i < nnz; i++) {
+        count[tmp[i].row_index + 1]++;
+    }
+    for (size_t r = 0; r < rows; r++) {
+        count[r + 1] += count[r];
+    }
+    for (size_t i = 0; i < nnz; i++) {
+        m->data[count[tmp[i].row_index]++] = tmp[i];
+    }
+
+    free(tmp);
+    free(count);
+}

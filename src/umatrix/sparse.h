@@ -7,17 +7,17 @@
 #include "elemental.h"
 #include <stddef.h>
 
-typedef struct U_Sparse_Value{
+typedef struct U_Sparse_Triplet{
     size_t row_index;
     size_t col_index;
     double value;
-} U_Sparse_Value;
+} U_Sparse_Triplet;
 
-typedef struct U_Cmpx_Sparse_Value{
+typedef struct U_Cmpx_Sparse_Triplet{
     size_t row_index;
     size_t col_index;
     double complex value;
-} U_Cmpx_Sparse_Value;
+} U_Cmpx_Sparse_Triplet;
 
 /* use if most part of the real matrix is zero, only holds non-zero values */
 typedef struct U_Matrix_Sparse{
@@ -26,7 +26,7 @@ typedef struct U_Matrix_Sparse{
     size_t stride;
     size_t data_num; // how many value in that matrix is not zero, also size of the data
     size_t container_size; // how many is the max size of data
-    U_Sparse_Value *data;
+    U_Sparse_Triplet *data;
 } U_Matrix_Sparse;
 
 /* use if most part of the complex matrix is zero, only holds non-zero values */
@@ -36,11 +36,11 @@ typedef struct U_Cmpx_Matrix_Sparse{
     size_t stride;
     size_t data_num; // how many value in that matrix is not zero, also size of the data
     size_t container_size; // how many is the max size of data
-    U_Cmpx_Sparse_Value *data;
+    U_Cmpx_Sparse_Triplet *data;
 } U_Cmpx_Matrix_Sparse;
 
 // check is it NULL. if NULL -> this (i, j) is still zero in sparse real matrix
-static inline U_Sparse_Value *um_at_sparse(U_Matrix_Sparse *m, size_t i, size_t j){
+static inline U_Sparse_Triplet *um_at_sparse(U_Matrix_Sparse *m, size_t i, size_t j){
     size_t row_num = m->rows;
     size_t col_num = m->cols;
     UM_ASSERT(i < row_num && j < col_num);
@@ -53,7 +53,7 @@ static inline U_Sparse_Value *um_at_sparse(U_Matrix_Sparse *m, size_t i, size_t 
 }
 
 // check is it NULL. if NULL -> this (i, j) is still zero in sparse complex matrix
-static inline U_Cmpx_Sparse_Value *um_cmpx_at_sparse(U_Cmpx_Matrix_Sparse *m, size_t i, size_t j){
+static inline U_Cmpx_Sparse_Triplet *um_cmpx_at_sparse(U_Cmpx_Matrix_Sparse *m, size_t i, size_t j){
     size_t row_num = m->rows;
     size_t col_num = m->cols;
     UM_ASSERT(i < row_num && j < col_num);
@@ -81,11 +81,7 @@ void um_cmpx_set_val_sparse(U_Cmpx_Matrix_Sparse *m, size_t i, size_t j, double 
 void um_free_null_sparse(U_Matrix_Sparse *m);
 void um_cmpx_free_null_sparse(U_Cmpx_Matrix_Sparse *m);
 
-void um_print_sparse(U_Matrix_Sparse *m, const char *name);
-void um_cmpx_print_sparse(U_Cmpx_Matrix_Sparse *m, const char *name);
-#define UM_PRINT_SPARSE(m) um_print_sparse((m), #m)
-#define UM_CMPX_PRINT_SPARSE(m) um_cmpx_print_sparse((m), #m);
-
-
+void um_sparse_give_order(U_Matrix_Sparse *m);
+void um_cmpx_sparse_give_order(U_Cmpx_Matrix_Sparse *m);
 
 #endif // SPARSE_H_
